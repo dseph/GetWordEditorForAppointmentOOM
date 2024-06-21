@@ -1,0 +1,43 @@
+' GetWordEditorForAppointmentOOM()
+' This is a VBA sample which you can run in Office Debugger from Outlook to test 
+' setting a word object to the body of a newly created appointment. 
+' Note: In the Outlook VBA Debugger Tools Menu to the References window and add a reference
+' to Microsoft Word - one which matches the same version of Outlook you are using.
+Function GetWordEditorForAppointmentOOM()
+
+    Dim myInspector As Outlook.Inspector
+    Dim wdDoc As Word.Document
+    
+    Dim wdRange As Word.Range
+    Dim apti As AppointmentItem
+    
+    Set apti = Application.CreateItem(olAppointmentItem)
+    apti.Subject = "My Special Day"
+    apti.Start = DateAdd("n", 16, Now)
+    apti.End = DateAdd("n", 60, apti.Start)
+    apti.ReminderSet = True
+    apti.ReminderMinutesBeforeStart = 60
+    
+    ' At this point the basic appointment information is set and we just need to handle the body.
+    
+    ' The Inspector has the properties which need to be checked.
+    
+    Set myInspector = apti.GetInspector
+  
+    If (myInspector.IsWordMail = True And myInspector.EditorType = olEditorWord) Then
+    
+        Set wdDoc = myInspector.WordEditor
+          
+        Set wdRange = wdDoc.Range(0, wdDoc.Characters.Count)
+        wdRange.InsertAfter ("Hello world.  ")
+        wdRange.InsertAfter ("This is my Outlook version: " + Outlook.Version + ".  ")
+        wdRange.InsertAfter ("This is my Word version: " + wdDoc.Application.Version + ".  ")
+       
+    End If
+    
+    apti.Display (True)
+     
+    
+End Function
+
+
